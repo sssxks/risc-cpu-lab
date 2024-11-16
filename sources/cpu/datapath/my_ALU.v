@@ -2,11 +2,11 @@
 `default_nettype none
 
 module my_ALU(
-    input [31:0] A,
-    input [2:0] ALU_operation,
-    input [31:0] B,
-    output reg [31:0] res,  // Declare res as reg
-    output reg zero         // Declare zero as reg
+    input wire [31:0] A,
+    input wire [2:0] ALU_operation,
+    input wire [31:0] B,
+    output reg [31:0] res,
+    output reg zero
 );
     always @ (*) begin
         case (ALU_operation)

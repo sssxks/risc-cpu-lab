@@ -28,6 +28,4 @@ Thumbs.db
 build/
 dist/
 
-*.xci
-
-imports/
+ip/
