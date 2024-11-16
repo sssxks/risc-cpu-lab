@@ -46,7 +46,7 @@ module SCPU(
     );
 
     // Instantiate the data path
-    DataPath data_path (
+    my_datapath data_path (
         .clk(clk),             // Clock signal
         .rst(rst),             // Reset signal
         .inst_field(inst_in),  // Instruction input
