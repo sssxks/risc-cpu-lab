@@ -100,7 +100,7 @@ module test_soc(
         .inst_in(inst)
     );
 
-    ROM_inst U2(
+    instruction_memory U2(
         .clka(~clk_100mhz), // TODO 存储器时钟，与CPU反向
 
         .addra(PC[11:2]), // ROM地址PC指针，来自CPU
