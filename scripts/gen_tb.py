@@ -5,7 +5,7 @@ import datetime
 template_file = 'tbtemplate.v'
 
 # Define the output testbench file path
-output_file = 'div32_tb.v'
+output_file = 'my_cpu_control_tb.v'
 
 # Read the template file
 with open(template_file, 'r') as file:
@@ -13,25 +13,37 @@ with open(template_file, 'r') as file:
 
 # Generate the test cases
 testcase_template = """
-       start = 1;
-       dividend = 32'd{dividend};
-       divisor  = 32'd{divisor};
-       #335
-       start = 0;
-       #335
-       `assert(quotient, {quotient})
-       `assert(remainder, {remainder})
+        // {assembly}
+        inst = 32'h{inst};
+        MIO_ready = 1'b1;
+        #10;
+        `assert(ImmSel, 2'b{ImmSel});
+        `assert(ALUSrc_B, 1'b{ALUSrc_B});
+        `assert(MemtoReg, 2'b{MemtoReg});
+        `assert(Jump, 1'b{Jump});
+        `assert(Branch, 1'b{Branch});
+        `assert(RegWrite, 1'b{RegWrite});
+        `assert(MemRW, 1'b{MemRW});
+        `assert(ALU_Control, 3'b{ALU_Control});
+        `assert(CPU_MIO, 1'b{CPU_MIO});
 """
 
 test_cases = test_case.test_cases
 testcase_strings = []
 
-for dividend, divisor, expected_quotient, expected_remainder in test_cases:
+for case in test_cases:
     testcase_strings.append(testcase_template.format(
-        dividend=dividend,
-        divisor=divisor,
-        quotient=expected_quotient,
-        remainder=expected_remainder
+        assembly=case['assembly'],
+        inst=case['inst'],
+        ImmSel=case['ImmSel'],
+        ALUSrc_B=case['ALUSrc_B'],
+        MemtoReg=case['MemtoReg'],
+        Jump=case['Jump'],
+        Branch=case['Branch'],
+        RegWrite=case['RegWrite'],
+        MemRW=case['MemRW'],
+        ALU_Control=case['ALU_Control'],
+        CPU_MIO=case['CPU_MIO']
     ))
 
 testcases = "\n".join(testcase_strings)

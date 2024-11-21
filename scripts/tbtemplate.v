@@ -5,41 +5,38 @@
         $finish; \
     end
 
+module my_cpu_control_tb();
+    reg [31:0] inst;
+    reg MIO_ready;
+    
+    wire [1:0] ImmSel;
+    wire ALUSrc_B;
+    wire [1:0] MemtoReg;
+    wire Jump;
+    wire Branch;
+    wire RegWrite;
+    wire MemRW;
+    wire [2:0] ALU_Control;
+    wire CPU_MIO;
 
-module div32_tb();
-      reg clk;
-      reg rst;
-      reg [31:0] dividend;
-      reg [31:0] divisor;
-      reg start;
-      
-      wire [31:0] quotient;
-      wire [31:0] remainder;
-      wire finish;
-      div32   u_div(
-         .clk(clk),
-         .rst(rst),
-         .dividend(dividend),
-         .divisor(divisor),
-         .start(start),
-         .quotient(quotient),
-         .remainder(remainder),
-         .finish(finish)
-      );
-      always #5 clk = ~clk;
-      
-      initial begin
-       clk =0;
-       rst = 1;
-       start = 0;
-       dividend = 32'd0;
-       divisor  = 32'd0;
-       #10
-       rst = 0;
+    my_cpu_control ctl_unit(
+        .OPcode(inst[6:2]),
+        .Fun3(inst[14:12]),
+        .Fun7(inst[30]),
+        .MIO_ready(MIO_ready),
+        .ImmSel(ImmSel),
+        .ALUSrc_B(ALUSrc_B),
+        .MemtoReg(MemtoReg),
+        .Jump(Jump),
+        .Branch(Branch),
+        .RegWrite(RegWrite),
+        .MemRW(MemRW),
+        .ALU_Control(ALU_Control),
+        .CPU_MIO(CPU_MIO)
+    );
 
-       {testcases}
-       
-       $stop();   
-      
-      end
+    initial begin
+        {testcases}
+        $stop();
+    end
 endmodule

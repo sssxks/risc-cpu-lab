@@ -51,9 +51,9 @@ module my_datapath (
     // ALU
     wire [31:0] imm_out;
     my_immgen immgen(
-        .ImmSel(ImmSel),
-        .instr(inst_field),
-        .imm_out(imm_out)
+        .ImmSel(ImmSel), // type of the instruction
+        .instr(inst_field), // raw instruction
+        .imm_out(imm_out) // 32 bit immediate value
     );
 
     wire [31:0] alu_input_B = ALUSrc_B ? imm_out : rs2_data;
@@ -66,5 +66,5 @@ module my_datapath (
         .zero(zero)
     );
 
-    assign pc_next = Branch && zero ? PC_out + imm_out << 1 : PC_out + 4;
+    assign pc_next = Jump || (Branch && zero) ? PC_out + imm_out : PC_out + 4;
 endmodule

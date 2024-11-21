@@ -10,7 +10,7 @@
 //   - Clk_CPU: to CPU, counter, and 8digit 7-segment
 
 // Computer system | single cycle processor test environment
-module test_soc(
+module soc(
     input wire clk_100mhz,
     input wire RSTN, // 复位信号，低电平有效
     input wire [3:0] BTN_y, // buttons
@@ -111,7 +111,7 @@ module test_soc(
     wire [31:0] ram2bus, bus2ram;
     wire [9:0] bus2ram_addr;
     wire bus2ram_we;
-    RAM U3 (
+    data_memory U3 (
         .clka(~clk_100mhz), // 存储器时钟，与CPU反向
         .wea(bus2ram_we), // 存储器读写，来自MIO_BUS
         .addra(bus2ram_addr), // 地址线，来自MIO_BUS
@@ -213,7 +213,7 @@ module test_soc(
     );
 
     // Segment display
-    SSeg7_Dev_0 U6 (
+    Seg7_Dev U6 (
         .scan(clk_div[18:16]),// input wire [2 : 0] scan
         .disp_num(disp_num),  // input wire [31 : 0] disp_num
         .point(point_out),    // input wire [7 : 0] point
