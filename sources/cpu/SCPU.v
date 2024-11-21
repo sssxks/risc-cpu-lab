@@ -1,5 +1,5 @@
-`timescale 1ns / 1ps
-`default_nettype none
+`include "header.vh"
+`include "vga_macro.vh"
 
 module SCPU(
     input wire clk,          // Clock signal
@@ -13,7 +13,8 @@ module SCPU(
     output wire CPU_MIO,       // CPU to Memory I/O signal
     output wire [31:0] Addr_out, // Address output to memory
     output wire [31:0] Data_out, // Data output to memory
-    output wire [31:0] PC_out   // Program counter output
+    output wire [31:0] PC_out,   // Program counter output
+    `RegFile_Regs_output
 );
 
     // Control signals
@@ -62,7 +63,8 @@ module SCPU(
         
         .PC_out(PC_out),       // Program counter output
         .Data_out(Data_out),   // Data output to memory
-        .ALU_out(Addr_out)     // Address output to memory
+        .ALU_out(Addr_out),     // Address output to memory
+        `RegFile_Regs_Arguments
     );
 
 endmodule

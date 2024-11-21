@@ -1,4 +1,5 @@
 `include "header.vh"
+`include "vga_macro.vh"
 
 // naming pattern:
 //   - data bus: xxx2xxx
@@ -83,6 +84,7 @@ module soc(
     // connection between CPU and ROM
     wire [31:0] PC;
     wire [31:0] inst;
+    `RegFile_Regs_Declaration
 
     SCPU U1(
         .clk(Clk_CPU),
@@ -97,7 +99,8 @@ module soc(
 
         // connection between CPU and ROM
         .PC_out(PC),
-        .inst_in(inst)
+        .inst_in(inst),
+        `RegFile_Regs_Arguments
     );
 
     instruction_memory U2(
@@ -123,6 +126,7 @@ module soc(
     // master: CPU
     // slave: RAM, counter, peripheral
     wire [31:0] bus2peripheral;
+    wire bus2counter_we;
     MIO_BUS U4(
         .clk(clk_100mhz), // 主板时钟
         .rst(rst), // 复位，按钮BTN3
@@ -157,7 +161,6 @@ module soc(
         .led_out(led_out[15:0]) // **来自**LED设备的输入（回读）
     );
 
-    wire bus2counter_we;
     wire counter0_out, counter1_out, counter2_out;
     wire [31:0] counter2bus;
     wire [1:0] counter_channel;
@@ -259,7 +262,8 @@ module soc(
         .vs(VSYNC),
         .vga_r(Red),
         .vga_g(Green),
-        .vga_b(Blue)
+        .vga_b(Blue),
+        `RegFile_Regs_Arguments
     );
 
 endmodule

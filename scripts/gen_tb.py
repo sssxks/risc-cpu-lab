@@ -16,7 +16,7 @@ testcase_template = """
         // {assembly}
         inst = 32'h{inst};
         MIO_ready = 1'b1;
-        #10;
+        #5;
         `assert(ImmSel, 2'b{ImmSel});
         `assert(ALUSrc_B, 1'b{ALUSrc_B});
         `assert(MemtoReg, 2'b{MemtoReg});
@@ -26,6 +26,7 @@ testcase_template = """
         `assert(MemRW, 1'b{MemRW});
         `assert(ALU_Control, 3'b{ALU_Control});
         `assert(CPU_MIO, 1'b{CPU_MIO});
+        #5;
 """
 
 test_cases = test_case.test_cases
