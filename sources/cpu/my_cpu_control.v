@@ -1,13 +1,13 @@
-`timescale 1ns / 1ps
-`default_nettype none
+`include "header.vh"
 
 module my_cpu_control(
     // from instruction
-    input wire [4:0]OPcode, // instruction[6:2]
-    input wire [2:0]Fun3, // instruction[12:14]
+    input wire [4:0] OPcode, // instruction[6:2]
+    input wire [2:0] Fun3, // instruction[12:14]
     input wire Fun7, // instruction[30]
 
     input wire MIO_ready, 
+    output wire CPU_MIO,
 
     // signals to datapath
     output reg [1:0]ImmSel,
@@ -15,15 +15,16 @@ module my_cpu_control(
     output reg [1:0]MemtoReg,
     output reg Jump,
     output reg Branch,
+    output reg InverseBranch,
     output reg RegWrite,
     output reg MemRW,
-    output reg CPU_MIO,
-    output reg [2:0]ALU_Control
+    output reg [3:0]ALU_Control
 );
+    assign CPU_MIO = 1'b1; // not used so far
+
     always @(*) begin
-        CPU_MIO = 1'b1;
         case (OPcode)
-            5'b01100: begin // R-type
+            `OPCODE_R_TYPE: begin
                 ImmSel = 2'bxx; // doesn't matter
                 ALUSrc_B = 1'b0; // rs2
                 MemtoReg = 2'b00; // alu result
@@ -31,22 +32,11 @@ module my_cpu_control(
                 Branch = 1'b0;
                 RegWrite = 1'b1;
                 MemRW = 1'b0;
+                InverseBranch = 1'bx; // doesn't matter
 
-                case ({Fun7, Fun3})
-                    4'b0_000: ALU_Control = 3'b010; // ADD
-                    4'b1_000: ALU_Control = 3'b110; // SUB
-                    4'b0_001: ALU_Control = 3'b001; // SLL // TODO no sll
-                    4'b0_010: ALU_Control = 3'b111; // SLT
-                    4'b0_011: ALU_Control = 3'b011; // SLTU
-                    4'b0_100: ALU_Control = 3'b000; // XOR
-                    4'b0_101: ALU_Control = 3'b101; // SRL
-                    4'b1_101: ALU_Control = 3'b100; // SRA
-                    4'b0_110: ALU_Control = 3'b100; // OR
-                    4'b0_111: ALU_Control = 3'b111; // AND
-                    default: ALU_Control = 3'bxxx; // Undefined
-                endcase
+                ALU_Control = {Fun7, Fun3};
             end
-            5'b00100: begin // I-type w/o load, jalr
+            `OPCODE_IMMEDIATE_CALCULATION: begin
                 ImmSel = 2'b00;
                 ALUSrc_B = 1'b1;
                 MemtoReg = 2'b00;
@@ -54,22 +44,14 @@ module my_cpu_control(
                 Branch = 1'b0;
                 RegWrite = 1'b1;
                 MemRW = 1'b0;
+                InverseBranch = 1'bx; // doesn't matter
 
-                case (Fun3)
-                    3'b000: ALU_Control = 3'b010; // ADDI
-                    3'b010: ALU_Control = 3'b111; // SLTI
-                    3'b011: ALU_Control = 3'b011; // SLTIU
-                    3'b100: ALU_Control = 3'b000; // XORI
-                    3'b110: ALU_Control = 3'b100; // ORI
-                    3'b111: ALU_Control = 3'b111; // ANDI
-                    3'b001: ALU_Control = 3'b001; // SLLI
-                    // shift right arithematic & shift right arithematic uses additional
-                    // func6 in the immediate part (special case of I type)
-                    3'b101: ALU_Control = Fun7 ? 3'b100 : 3'b101; // SRAI/SRLI
-                    default: ALU_Control = 3'bxxx; // Undefined
-                endcase
+                // I type format doesn't have Fun7
+                // but shift right logical & shift right arithmatic 
+                // has additional Fun6 as a special case of I type format
+                ALU_Control = {Fun3 == `FUN3_SR ? Fun7 : 0, Fun3};
             end
-            5'b00000: begin // I-type Load
+            `OPCODE_LOAD: begin
                 ImmSel = 2'b00;
                 ALUSrc_B = 1'b1;
                 MemtoReg = 2'b01;
@@ -77,51 +59,22 @@ module my_cpu_control(
                 Branch = 1'b0;
                 RegWrite = 1'b1;
                 MemRW = 1'b0;
+                InverseBranch = 1'bx; // doesn't matter
 
-                ALU_Control = 3'b010; // ADD
-            end
-            5'b01000: begin // S-type (store)
-                ImmSel = 2'b01;
-                ALUSrc_B = 1'b1;
-                MemtoReg = 2'b00;
-                Jump = 1'b0;
-                Branch = 1'b0;
-                RegWrite = 1'b0;
-                MemRW = 1'b1;
 
-                ALU_Control = 3'b010; // ADD
-            end
-            5'b11000: begin // SB-type branch
-                ImmSel = 2'b10;
-                ALUSrc_B = 1'b0;
-                MemtoReg = 2'b00;
-                Jump = 1'b0;
-                Branch = 1'b1;
-                RegWrite = 1'b0;
-                MemRW = 1'b0;
+                ALU_Control = `ALU_ADD;
 
-                case (Fun3)
-                    3'b000: ALU_Control = 3'b110; // BEQ
-                    3'b001: ALU_Control = 3'b110; // BNE
-                    3'b100: ALU_Control = 3'b111; // BLT
-                    3'b101: ALU_Control = 3'b111; // BGE
-                    3'b110: ALU_Control = 3'b011; // BLTU
-                    3'b111: ALU_Control = 3'b011; // BGEU
-                    default: ALU_Control = 3'bxxx; // Undefined
-                endcase
+                // right now, only support lw
+                // case (Fun3)
+                //     FUN3_LW:
+                //     FUN3_LH:
+                //     FUN3_LHU
+                //     FUN3_LB: 
+                //     FUN3_LBU:
+                //     default: 
+                // endcase
             end
-            5'b11011: begin // UJ-type JAL
-                ImmSel = 2'b11;
-                ALUSrc_B = 1'b0;
-                MemtoReg = 2'b10;
-                Jump = 1'b1;
-                Branch = 1'b0;
-                RegWrite = 1'b1;
-                MemRW = 1'b0;
-
-                ALU_Control = 3'bxxx; // Undefined
-            end
-            5'b11001: begin // I-type: JALR
+            `OPCODE_JALR: begin
                 ImmSel = 2'b01; // i type
                 ALUSrc_B = 1'b1;
                 MemtoReg = 2'b10;
@@ -129,10 +82,64 @@ module my_cpu_control(
                 Branch = 1'b0;
                 RegWrite = 1'b1;
                 MemRW = 1'b0;
+                InverseBranch = 1'bx; // doesn't matter
 
-                ALU_Control = 3'b010; // ADD
+                ALU_Control = `ALU_ADD; // ADD
             end
-            default: begin
+            `OPCODE_S_TYPE: begin
+                ImmSel = 2'b01;
+                ALUSrc_B = 1'b1;
+                MemtoReg = 2'b00;
+                Jump = 1'b0;
+                Branch = 1'b0;
+                RegWrite = 1'b0;
+                MemRW = 1'b1;
+                InverseBranch = 1'bx; // doesn't matter
+
+                ALU_Control = `ALU_ADD; // ADD
+
+                // right now, only support sw
+                // case (Fun3)
+                //     FUN3_SW:
+                //     FUN3_SH:
+                //     FUN3_SB:
+                //     default: 
+                // endcase
+            end
+            `OPCODE_SB_TYPE: begin // SB-type branch
+                ImmSel = 2'b10;
+                ALUSrc_B = 1'b0;
+                MemtoReg = 2'b00;
+                Jump = 1'b0;
+                Branch = 1'b1;
+                RegWrite = 1'b0;
+                MemRW = 1'b0;
+                InverseBranch = Fun3[0]; // NE, GE, GEU
+
+                case (Fun3)
+                    `FUN3_BEQ: ALU_Control = `ALU_EQ;
+                    `FUN3_BNE: ALU_Control = `ALU_NE;
+                    `FUN3_BLT: ALU_Control = `ALU_LT;
+                    `FUN3_BGE: ALU_Control = `ALU_GE;
+                    `FUN3_BLTU: ALU_Control = `ALU_LTU;
+                    `FUN3_BGEU: ALU_Control = `ALU_GEU;
+                    default: ALU_Control = 4'bxxxx; // Undefined
+                endcase
+            end
+            `OPCODE_UJ_TYPE: begin // UJ-type JAL
+                ImmSel = 2'b11;
+                ALUSrc_B = 1'b0;
+                MemtoReg = 2'b10;
+                Jump = 1'b1;
+                Branch = 1'b0;
+                RegWrite = 1'b1;
+                MemRW = 1'b0;
+                InverseBranch = 1'bx; // doesn't matter
+
+                // this instruction doesn't use ALU
+                ALU_Control = 4'bxxxx; // Undefined
+            end
+            default: begin // should ignore, but for now, just set to undefined
                 ImmSel = 2'bxx;
                 ALUSrc_B = 1'bx;
                 MemtoReg = 2'bxx;
@@ -140,8 +147,9 @@ module my_cpu_control(
                 Branch = 1'bx;
                 RegWrite = 1'bx;
                 MemRW = 1'bx;
+                InverseBranch = 1'bx; // doesn't matter
 
-                ALU_Control = 3'bxxx;
+                ALU_Control = 4'bxxxx;
             end
         endcase
     end

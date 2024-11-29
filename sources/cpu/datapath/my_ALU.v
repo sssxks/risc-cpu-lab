@@ -1,26 +1,29 @@
-`timescale 1ns / 1ps
-`default_nettype none
+`include "header.vh"
 
+// this is behavioral model of ALU
+// not very efficient, but it's easy to maintain
 module my_ALU(
     input wire [31:0] A,
-    input wire [2:0] ALU_operation,
+    input wire [3:0] ALU_operation,
     input wire [31:0] B,
-    output reg [31:0] res,
-    output reg zero
+    output reg [31:0] result,
+    output wire zero
 );
-    always @ (*) begin
+    always @(*) begin
         case (ALU_operation)
-            3'b000: res = A & B;  // and
-            3'b001: res = A | B;  // or
-            3'b010: res = A + B;  // add
-            3'b011: res = A ^ B;  // xor
-            3'b100: res = ~(A | B);  // nor
-            3'b101: res = A >> B[4:0];  // srl (logical right shift)
-            3'b110: res = A - B;  // sub
-            3'b111: res = A < B;  // sltu
-            default: res = 32'b0;  // Default case
+            `ALU_ADD : result = A + B;                                        // ADD
+            `ALU_SUB : result = A - B;                                        // SUB
+            `ALU_SLL : result = A << B[4:0];                                  // SLL
+            `ALU_SLT : result = ($signed(A) < $signed(B)) ? 32'b1 : 32'b0;    // SLT
+            `ALU_SLTU: result = (A < B) ? 32'b1 : 32'b0;                      // SLTU
+            `ALU_XOR : result = A ^ B;                                        // XOR
+            `ALU_SRL : result = A >> B[5:0];                                  // SRL
+            `ALU_SRA : result = $signed(A) >> B[5:0];                         // SRA
+            `ALU_OR  : result = A | B;                                        // OR
+            `ALU_AND : result = A & B;                                        // AND
         endcase
-        
-        zero = (res == 32'b0);  // Set zero flag if result is 0
     end
+
+    assign zero = (result == 32'b0);
+
 endmodule

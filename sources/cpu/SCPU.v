@@ -23,8 +23,9 @@ module SCPU(
     wire [1:0] MemtoReg;       // Memory to register selection
     wire Jump;                 // Jump signal
     wire Branch;               // Branch signal
+    wire InverseBranch;        // Inverse branch signal
     wire RegWrite;             // Register write enable
-    wire [2:0] ALU_Control;    // ALU control signals
+    wire [3:0] ALU_Control;    // ALU control signals
 
     // Instantiate the control unit
     my_cpu_control control_unit (
@@ -40,6 +41,7 @@ module SCPU(
         .MemtoReg(MemtoReg),   // Memory to register selection
         .Jump(Jump),           // Jump signal
         .Branch(Branch),       // Branch signal
+        .InverseBranch(InverseBranch),// Inverse branch signal
         .RegWrite(RegWrite),   // Register write enable
         .MemRW(MemRW),         // Memory read/write signal
         .ALU_Control(ALU_Control), // ALU control signals
@@ -59,6 +61,7 @@ module SCPU(
         .ALUSrc_B(ALUSrc_B),   // ALU source B selection
         .Jump(Jump),           // Jump signal
         .Branch(Branch),       // Branch signal
+        .InverseBranch(InverseBranch),// Inverse branch signal
         .RegWrite(RegWrite),   // Register write enable
         
         .PC_out(PC_out),       // Program counter output

@@ -1,9 +1,6 @@
-`timescale 1ns / 1ps
-`define assert(signal, value) \
-    if (signal !== value) begin \
-        $display("ASSERTION FAILED in %m: signal != value"); \
-        $finish; \
-    end
+`include "header.vh"
+`include "debug.vh"
+`include "vga_macro.vh"
 
 module my_cpu_control_tb();
     reg [31:0] inst;
@@ -14,6 +11,7 @@ module my_cpu_control_tb();
     wire [1:0] MemtoReg;
     wire Jump;
     wire Branch;
+    wire InverseBranch;
     wire RegWrite;
     wire MemRW;
     wire [2:0] ALU_Control;
@@ -29,6 +27,7 @@ module my_cpu_control_tb();
         .MemtoReg(MemtoReg),
         .Jump(Jump),
         .Branch(Branch),
+        .InverseBranch(InverseBranch),
         .RegWrite(RegWrite),
         .MemRW(MemRW),
         .ALU_Control(ALU_Control),
