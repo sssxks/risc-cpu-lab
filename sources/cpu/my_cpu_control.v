@@ -35,7 +35,7 @@ module my_cpu_control(
                 case ({Fun7, Fun3})
                     4'b0_000: ALU_Control = 3'b010; // ADD
                     4'b1_000: ALU_Control = 3'b110; // SUB
-                    4'b0_001: ALU_Control = 3'b001; // SLL
+                    4'b0_001: ALU_Control = 3'b001; // SLL // TODO no sll
                     4'b0_010: ALU_Control = 3'b111; // SLT
                     4'b0_011: ALU_Control = 3'b011; // SLTU
                     4'b0_100: ALU_Control = 3'b000; // XOR

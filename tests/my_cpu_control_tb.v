@@ -1,12 +1,7 @@
 // Generated on 2024-11-21 15:05:32
 // WARNING: Do not modify this file. It is auto-generated.
-
-`timescale 1ns / 1ps
-`define assert(signal, value) \
-    if (signal !== value) begin \
-        $display("ASSERTION FAILED in %m: signal != value"); \
-        $finish; \
-    end
+`include "header.vh"
+`include "debug.vh"
 
 module my_cpu_control_tb();
     reg [31:0] inst;

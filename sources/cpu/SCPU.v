@@ -27,7 +27,7 @@ module SCPU(
     wire [2:0] ALU_Control;    // ALU control signals
 
     // Instantiate the control unit
-    SCPU_ctrl control_unit (
+    my_cpu_control control_unit (
         // from instruction
         .OPcode(inst_in[6:2]), // Opcode from instruction
         .Fun3(inst_in[14:12]), // Funct3 from instruction
