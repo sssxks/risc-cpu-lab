@@ -28,16 +28,14 @@ module soc_simulation(
     );
 
     instruction_memory U2(
-        .clka(clk),
-
-        .addra(program_counter[11:2]),
-        .douta(instruction)
+        .a(program_counter[11:2]),
+        .spo(instruction)
     );
 
     data_memory U3 (
         .clka(~clk), 
         .wea(data_memory_write_enable), 
-        .addra(cpu2datamem_addr[9:0]), 
+        .addra(cpu2datamem_addr[11:2]),
         .dina(cpu2datamem), 
         .douta(datamem2cpu) 
     );
@@ -51,12 +49,21 @@ module soc_simulation_tb;
     soc_simulation m0(.clk(clk), .rst(rst));
 
     initial begin
-        clk = 1'b0;
+        clk = 1'b1;
         rst = 1'b1;
-        #5;
+        #1;
         rst = 1'b0;
     end
 
-    always #10 clk = ~clk;
+    always #50 clk = ~clk;
+
+    // initial begin
+    //     clk = 1'b0;
+    //     rst = 1'b1;
+    //     #5;
+    //     rst = 1'b0;
+    // end
+
+    // always #50 clk = ~clk;
 
 endmodule
