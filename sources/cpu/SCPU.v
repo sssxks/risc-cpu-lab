@@ -18,7 +18,7 @@ module SCPU(
 );
 
     // Control signals
-    wire [1:0] ImmSel;         // Immediate selection
+    wire [2:0] ImmSel;         // Immediate selection
     wire ALUSrc_B;             // ALU source B selection
     wire [1:0] MemtoReg;       // Memory to register selection
     wire Jump;                 // Jump signal

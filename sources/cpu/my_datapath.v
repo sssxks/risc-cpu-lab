@@ -15,7 +15,7 @@ module my_datapath (
     input wire Jump, // unconditional jump instruction
     input wire Branch, // conditional jump instruction
     input wire InverseBranch, // 1: invert branch condition, 0: normal branch condition
-    input wire PCOffset, // 1: offset PC by imm, 0: alu result
+    input wire PCOffset, // 1: offset PC by alu result, 0: immediate value
     input wire RegWrite, // 1: write to register
 
     output wire [31:0] PC_out, // current PC to instruction memory
@@ -71,7 +71,7 @@ module my_datapath (
     );
 
     wire [31:0] PC_incr = PC_out + 4;
-    wire [31:0] PC_offset = PC_out + (PCOffset ?  imm_out : ALU_out);
+    wire [31:0] PC_offset = PCOffset ? ALU_out : PC_out + imm_out; // for jalr
 
     always @(*) begin
         case (MemtoReg)

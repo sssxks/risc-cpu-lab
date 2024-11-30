@@ -1,6 +1,6 @@
-jalr ok, need test
+jalr ok
 auipc ok, need test
-lui ok, need test
+lui ok
 
 lh
 lhu

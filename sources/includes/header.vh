@@ -11,8 +11,8 @@
 `define OPCODE_S_TYPE 5'b01000
 `define OPCODE_SB_TYPE 5'b11000
 `define OPCODE_UJ_TYPE 5'b11011
-// `define OPCODE_LUI 5'b01101
-// `define OPCODE_AUIPC 5'b00101
+`define OPCODE_LUI 5'b01101
+`define OPCODE_AUIPC 5'b00101
 
 // fun3, fun7/fun6 for R-type & immediate calculation
 // also the ALU control for corresponding instructions
