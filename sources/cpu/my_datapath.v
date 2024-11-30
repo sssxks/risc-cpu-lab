@@ -16,7 +16,7 @@ module my_datapath (
     input wire Branch, // conditional jump instruction
     input wire InverseBranch, // 1: invert branch condition, 0: normal branch condition
     input wire RegWrite, // 1: write to register
-    
+
     output wire [31:0] PC_out, // current PC to instruction memory
     output wire [31:0] Data_out, // 32-bit data to data memory
     output wire [31:0] ALU_out, // 32-bit ALU output (for debugging)
@@ -39,7 +39,7 @@ module my_datapath (
     Regs Regs(
         .clk(clk),
         .rst(rst),
-        
+
         .RegWrite(RegWrite),
         
         .Rs1_addr(inst_field[19:15]),
@@ -83,7 +83,7 @@ module my_datapath (
 
     assign Data_out = rs2_data; // sw rs2, 123(rs1): reg[rs2] -> mem[rs1 + 123]
 
-    wire if_pc_target = Jump || (Branch && InverseBranch ? zero : ~ zero);
+    wire if_pc_target = Jump || (Branch && (InverseBranch ? ~zero : zero));
 
     assign pc_next = if_pc_target ? PC_offset : PC_incr;
 endmodule

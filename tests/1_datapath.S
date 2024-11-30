@@ -25,10 +25,10 @@ loop:
 test: 
     lw  x22, 0x34(x0)     # x22 = 0x5555_5555 
     lw  x23, 0x48(x0)     # x23 = 0xAAAA_AAAA 
-    add x24, x22, x0    
-    sub x25, x23, x0 
-    sw  x24, 0x48(x0)  
-    sw  x25, 0x34(x0)
+    add x24, x22, x0     # x24 = 0x5555_5555
+    sub x25, x23, x0     # x25 = 0xAAAA_AAAA
+    sw  x24, 0x48(x0)    # x24 = 0x5555_5555
+    sw  x25, 0x34(x0)   # x25 = 0xAAAA_AAAA
     jal x26,  loop          # x26 = 0x0000_0074
     add x0, x0, x0        	 
 
