@@ -11,6 +11,8 @@
 `define OPCODE_S_TYPE 5'b01000
 `define OPCODE_SB_TYPE 5'b11000
 `define OPCODE_UJ_TYPE 5'b11011
+// `define OPCODE_LUI 5'b01101
+// `define OPCODE_AUIPC 5'b00101
 
 // fun3, fun7/fun6 for R-type & immediate calculation
 // also the ALU control for corresponding instructions
@@ -46,20 +48,20 @@
 `define FUN_AND 4'b0_111
 
 // fun3 for load
-`define FUN3_LW 3'010
-`define FUN3_LH 3'001
-`define FUN3_LHU 3'101
-`define FUN3_LB 3'000
-`define FUN3_LBU 3'100
+`define FUN3_LW 3'b010
+`define FUN3_LH 3'b001
+`define FUN3_LHU 3'b101
+`define FUN3_LB 3'b000
+`define FUN3_LBU 3'b100
 
 // fun3 for store
-`define FUN3_SW 3'010
-`define FUN3_SH 3'001
-`define FUN3_SB 3'000
+`define FUN3_SW 3'b010
+`define FUN3_SH 3'b001
+`define FUN3_SB 3'b000
 
 // fun3 for jalr
 // actually not useful, because opcode is already used to distinguish jalr
-`define FUN3_JALR 3'000
+`define FUN3_JALR 3'b000
 
 // no fun3 for U-type
 
@@ -91,3 +93,10 @@
 `define ALU_GE `ALU_SLT
 `define ALU_LTU `ALU_SLTU
 `define ALU_GEU `ALU_SLTU
+
+// immgen
+`define IMMGEN_I 3'b000
+`define IMMGEN_S 3'b001
+`define IMMGEN_SB 3'b010
+`define IMMGEN_UJ 3'b011
+`define IMMGEN_U 3'b100

@@ -24,6 +24,7 @@ module SCPU(
     wire Jump;                 // Jump signal
     wire Branch;               // Branch signal
     wire InverseBranch;        // Inverse branch signal
+    wire PCOffset;             // Program counter offset
     wire RegWrite;             // Register write enable
     wire [3:0] ALU_Control;    // ALU control signals
 
@@ -42,6 +43,7 @@ module SCPU(
         .Jump(Jump),           // Jump signal
         .Branch(Branch),       // Branch signal
         .InverseBranch(InverseBranch),// Inverse branch signal
+        .PCOffset(PCOffset),   // Program counter offset
         .RegWrite(RegWrite),   // Register write enable
         .MemRW(MemRW),         // Memory read/write signal
         .ALU_Control(ALU_Control), // ALU control signals
@@ -62,6 +64,7 @@ module SCPU(
         .Jump(Jump),           // Jump signal
         .Branch(Branch),       // Branch signal
         .InverseBranch(InverseBranch),// Inverse branch signal
+        .PCOffset(PCOffset),   // Program counter offset
         .RegWrite(RegWrite),   // Register write enable
         
         .PC_out(PC_out),       // Program counter output

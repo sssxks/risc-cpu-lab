@@ -49,21 +49,11 @@ module soc_simulation_tb;
     soc_simulation m0(.clk(clk), .rst(rst));
 
     initial begin
-        clk = 1'b1;
+        clk = 1'b0;
         rst = 1'b1;
-        #1;
+        #5;
         rst = 1'b0;
     end
 
     always #50 clk = ~clk;
-
-    // initial begin
-    //     clk = 1'b0;
-    //     rst = 1'b1;
-    //     #5;
-    //     rst = 1'b0;
-    // end
-
-    // always #50 clk = ~clk;
-
 endmodule

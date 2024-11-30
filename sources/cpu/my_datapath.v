@@ -9,12 +9,13 @@ module my_datapath (
     input wire [31:0] Data_in, // 32-bit data from data memory
 
     input wire [3:0] ALU_Control, // ALU control signals
-    input wire [1:0] ImmSel, // select signal to immgen. i-type / s-type / sb-type / uj-type
+    input wire [2:0] ImmSel, // select signal to immgen. i-type / s-type / sb-type / uj-type
     input wire [1:0] MemtoReg, // mem2reg(load) / alu2reg(R-type) / PC+4 (jalr)
     input wire ALUSrc_B, // 0: rs2, 1: imm
     input wire Jump, // unconditional jump instruction
     input wire Branch, // conditional jump instruction
     input wire InverseBranch, // 1: invert branch condition, 0: normal branch condition
+    input wire PCOffset, // 1: offset PC by imm, 0: alu result
     input wire RegWrite, // 1: write to register
 
     output wire [31:0] PC_out, // current PC to instruction memory
@@ -70,13 +71,14 @@ module my_datapath (
     );
 
     wire [31:0] PC_incr = PC_out + 4;
-    wire [31:0] PC_offset = PC_out + imm_out;
+    wire [31:0] PC_offset = PC_out + (PCOffset ?  imm_out : ALU_out);
 
     always @(*) begin
         case (MemtoReg)
             2'd0: reg_write_data = ALU_out;
             2'd1: reg_write_data = Data_in;
-            2'd2: reg_write_data = PC_incr;
+            2'd2: reg_write_data = Jump ? PC_incr : PC_offset; // jump=1 -> jalr, jump=0 -> auipc
+            2'd3: reg_write_data = imm_out;
             default: reg_write_data = 32'bx;
         endcase
     end
