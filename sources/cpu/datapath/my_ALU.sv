@@ -1,4 +1,4 @@
-`include "header.vh"
+`include "header.sv"
 
 // this is behavioral model of ALU
 // not very efficient, but it's easy to maintain
@@ -21,6 +21,7 @@ module my_ALU(
             `ALU_SRA : result = $signed(A) >>> B[5:0];                    // SRA
             `ALU_OR  : result = A | B;                                    // OR
             `ALU_AND : result = A & B;                                    // AND
+            default: result = 32'bx;
         endcase
     end
 

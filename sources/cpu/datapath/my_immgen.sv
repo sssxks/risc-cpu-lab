@@ -1,4 +1,4 @@
-`include "header.vh"
+`include "header.sv"
 
 module my_immgen(
     input wire [2:0] ImmSel,
@@ -12,6 +12,7 @@ module my_immgen(
             `IMMGEN_SB:imm_out = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
             `IMMGEN_UJ:imm_out = {{11{instr[31]}}, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0};
             `IMMGEN_U:imm_out = {instr[31:12], 12'b0};
+            default: imm_out = 32'bx;
         endcase
     end
 endmodule

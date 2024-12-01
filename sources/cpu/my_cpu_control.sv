@@ -1,4 +1,4 @@
-`include "header.vh"
+`include "header.sv"
 
 module my_cpu_control(
     // from instruction
@@ -61,7 +61,7 @@ module my_cpu_control(
                 // I type format doesn't have Fun7
                 // but shift right logical & shift right arithmatic 
                 // has additional Fun6 as a special case of I type format
-                ALU_Control = {Fun3 == `FUN3_SR ? Fun7 : 0, Fun3};
+                ALU_Control = {Fun3 == `FUN3_SR ? Fun7 : 1'b0, Fun3};
             end
             `OPCODE_LOAD: begin
                 ImmSel = `IMMGEN_I;

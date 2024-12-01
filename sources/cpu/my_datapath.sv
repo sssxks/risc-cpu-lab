@@ -1,4 +1,4 @@
-`include "header.vh"
+`include "header.sv"
 `include "vga_macro.vh"
 
 module my_datapath (
@@ -21,7 +21,7 @@ module my_datapath (
     input wire RegWrite, // 1: write to register
 
     output wire [31:0] PC_out, // current PC to instruction memory
-    output wire [31:0] Data_out_raw, // 32-bit data to data memory
+    output wire [31:0] Data_out, // 32-bit data to data memory
     output wire [31:0] Addr_out, // 32-bit address to data memory (ALU result)
     `RegFile_Regs_output
 );

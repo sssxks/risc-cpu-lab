@@ -1,5 +1,4 @@
-`include "header.vh"
-
+`include "header.sv"
 
 // wrapper for memory, providing endianess and sign extension
 module mem_handler (
@@ -15,7 +14,8 @@ module mem_handler (
     output reg [31:0] Data_in_processed,
     // output to data memory
     output reg [3:0] MemWriteEnable,
-    output reg [31:0] Data_out_processed
+    output reg [31:0] Data_out_processed,
+    output reg [31:0] Addr_out_aligned
 );
     assign Addr_out_aligned = {Addr_out[31:2], 2'b00}; // Align address to 4 bytes
     wire [1:0] where = Addr_out[1:0]; // word offset
@@ -51,7 +51,7 @@ module mem_handler (
                         1'b1: Data_in_processed = {16'b0, Data_in[31:16]};
                     endcase
                 end
-                `FUN3_LW: Data_in_processed = Data_in;
+                `WORD: Data_in_processed = Data_in;
                 default: Data_in_processed = 32'bx;
             endcase
             Data_out_processed = 32'b0;

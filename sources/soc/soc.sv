@@ -1,4 +1,4 @@
-`include "header.vh"
+`include "header.sv"
 `include "vga_macro.vh"
 
 // naming pattern:

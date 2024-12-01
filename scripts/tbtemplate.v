@@ -1,4 +1,4 @@
-`include "header.vh"
+`include "header.sv"
 `include "debug.vh"
 `include "vga_macro.vh"
 
