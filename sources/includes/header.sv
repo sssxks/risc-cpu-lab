@@ -13,6 +13,7 @@
 `define OPCODE_UJ_TYPE 5'b11011
 `define OPCODE_LUI 5'b01101
 `define OPCODE_AUIPC 5'b00101
+`define OPCODE_SYSTEM 5'b11100
 
 // fun3, fun7/fun6 for R-type & immediate calculation
 // also the ALU control for corresponding instructions
@@ -74,6 +75,13 @@
 `define FUN3_BGEU 3'b111
 
 // no fun3 for UJ-type (only jal)
+
+// fun12 for system
+`define FUN12_ECALL 12'b0000000_00000
+`define FUN12_EBREAK 12'b0000000_00001
+`define FUN12_MRET 12'b0011000_00010
+`define FUN12_SRET 12'b0001000_00010
+`define FUN12_WFI 12'b0001000_00101
 
 // alu control
 `define ALU_ADD 4'b0_000

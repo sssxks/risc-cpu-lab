@@ -3,7 +3,9 @@
 
 module soc_simulation(
     input wire clk,
-    input wire rst
+    input wire rst,
+
+    input wire ext_int
 );
     wire [31:0] instruction;
     wire [31:0] program_counter;
@@ -13,6 +15,8 @@ module soc_simulation(
     SCPU uut (
         .clk(clk),
         .rst(rst),
+
+        .ext_int(ext_int),
 
         .inst_in(instruction),
         .PC_out(program_counter),
@@ -36,12 +40,14 @@ endmodule
 module soc_simulation_tb;
     reg clk;
     reg rst;
+    reg ext_int;
 
-    soc_simulation m0(.clk(clk), .rst(rst));
+    soc_simulation m0(.clk(clk), .rst(rst), .ext_int(ext_int));
 
     initial begin
         clk = 1'b0;
         rst = 1'b1;
+        ext_int = 1'b0;
         #5;
         rst = 1'b0;
     end

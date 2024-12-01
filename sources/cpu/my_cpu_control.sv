@@ -2,10 +2,15 @@
 `include "cpu_control_signals.sv"
 
 module my_cpu_control(
+    input wire rst,
     // from instruction
     input wire [4:0] OPcode, // instruction[6:2]
     input wire [2:0] Fun3, // instruction[12:14]
     input wire Fun7, // instruction[30]
+
+    input wire [31:0] instruction,
+
+    input wire ext_int,
 
     // signals to datapath
     cpu_control_signals.control_unit signals_if,
@@ -15,7 +20,10 @@ module my_cpu_control(
     
 );
     always @(*) begin
-        case (OPcode)
+        if (rst) begin
+            
+        end else begin
+            case (OPcode)
             `OPCODE_R_TYPE: begin
                 signals_if.ImmSel = 3'bxxx; // doesn't matter
                 signals_if.ALUSrc_B = 1'b0; // rs2
@@ -31,6 +39,9 @@ module my_cpu_control(
 
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
+
+                signals_if.IntCause = 2'b0; // doesn't cause an interruption
+                signals_if.MRet = 1'b0;
 
                 signals_if.ALU_Control = {Fun7, Fun3};
             end
@@ -49,6 +60,9 @@ module my_cpu_control(
 
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
+
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
 
                 // I type format doesn't have Fun7
                 // but shift right logical & shift right arithmatic 
@@ -71,6 +85,9 @@ module my_cpu_control(
                 MemRW = 1'b0;
                 RWType = Fun3;
 
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
+
                 signals_if.ALU_Control = `ALU_ADD;
             end
             `OPCODE_JALR: begin
@@ -87,6 +104,9 @@ module my_cpu_control(
 
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
+
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
 
                 signals_if.ALU_Control = `ALU_ADD; // ADD
             end
@@ -106,6 +126,9 @@ module my_cpu_control(
                 MemRW = 1'b1;
                 RWType = Fun3;
 
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
+
                 signals_if.ALU_Control = `ALU_ADD; // ADD
             end
             `OPCODE_SB_TYPE: begin // SB-type branch
@@ -123,14 +146,37 @@ module my_cpu_control(
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
 
+                signals_if.MRet = 1'b0;
+
                 case (Fun3)
-                    `FUN3_BEQ: signals_if.ALU_Control = `ALU_EQ;
-                    `FUN3_BNE: signals_if.ALU_Control = `ALU_NE;
-                    `FUN3_BLT: signals_if.ALU_Control = `ALU_LT;
-                    `FUN3_BGE: signals_if.ALU_Control = `ALU_GE;
-                    `FUN3_BLTU: signals_if.ALU_Control = `ALU_LTU;
-                    `FUN3_BGEU: signals_if.ALU_Control = `ALU_GEU;
-                    default: signals_if.ALU_Control = 4'bxxxx; // Undefined
+                    `FUN3_BEQ: begin
+                        signals_if.ALU_Control = `ALU_EQ;
+                        signals_if.IntCause = 2'b0;
+                    end
+                    `FUN3_BNE: begin
+                        signals_if.ALU_Control = `ALU_NE;
+                        signals_if.IntCause = 2'b0;
+                    end
+                    `FUN3_BLT: begin
+                        signals_if.ALU_Control = `ALU_LT;
+                        signals_if.IntCause = 2'b0;
+                    end
+                    `FUN3_BGE: begin
+                        signals_if.ALU_Control = `ALU_GE;
+                        signals_if.IntCause = 2'b1; // TODO change this back later
+                    end
+                    `FUN3_BLTU: begin
+                        signals_if.ALU_Control = `ALU_LTU;
+                        signals_if.IntCause = 2'b0;
+                    end
+                    `FUN3_BGEU: begin
+                        signals_if.ALU_Control = `ALU_GEU;
+                        signals_if.IntCause = 2'b0;
+                    end
+                    default: begin
+                        signals_if.ALU_Control = 4'bxxxx; // Undefined
+                        signals_if.IntCause = 2'b1;
+                    end
                 endcase
             end
             `OPCODE_UJ_TYPE: begin // UJ-type JAL
@@ -147,6 +193,9 @@ module my_cpu_control(
 
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
+
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
 
                 // this instruction doesn't use ALU
                 signals_if.ALU_Control = 4'bxxxx; // Undefined
@@ -166,6 +215,9 @@ module my_cpu_control(
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
 
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
+
                 // this instruction doesn't use ALU
                 signals_if.ALU_Control = 4'bxxxx; // Undefined
             end
@@ -184,8 +236,43 @@ module my_cpu_control(
                 MemRW = 1'b0;
                 RWType = 3'b000; // doesn't matter
 
+                signals_if.IntCause = 2'b0;
+                signals_if.MRet = 1'b0;
+
                 // this instruction doesn't use ALU
                 signals_if.ALU_Control = 4'bxxxx; // Undefined
+            end
+            `OPCODE_SYSTEM: begin
+                signals_if.ImmSel = 3'bxxx;
+                signals_if.ALUSrc_B = 1'bx;
+                signals_if.MemtoReg = 2'bxx;
+
+                signals_if.Jump = 1'b0;
+                signals_if.Branch = 1'b0;
+                signals_if.InverseBranch = 1'bx;
+                signals_if.PCOffset = 1'bx;
+
+                signals_if.RegWrite = 1'b0;
+
+                MemRW = 1'bx;
+                RWType = 3'bxxx;
+
+
+                signals_if.ALU_Control = 4'bxxxx;
+                case (instruction[31:20])
+                    `FUN12_ECALL: begin
+                        signals_if.IntCause = 2'd2;
+                        signals_if.MRet = 1'b0;
+                    end
+                    `FUN12_MRET: begin
+                        signals_if.IntCause = 2'd0;
+                        signals_if.MRet = 1'b1;
+                    end
+                    default: begin
+                        signals_if.IntCause = 2'd1;
+                        signals_if.MRet = 1'b0;
+                    end
+                endcase
             end
             default: begin // should ignore, but for now, just set to undefined
                 signals_if.ImmSel = 3'bxxx;
@@ -194,16 +281,21 @@ module my_cpu_control(
 
                 signals_if.Jump = 1'bx;
                 signals_if.Branch = 1'bx;
-                signals_if.InverseBranch = 1'bx; // doesn't matter
+                signals_if.InverseBranch = 1'bx;
                 signals_if.PCOffset = 1'bx; 
 
-                signals_if.RegWrite = 1'bx;
+                signals_if.RegWrite = 1'b0;
 
                 MemRW = 1'bx;
-                RWType = 3'bxxx; // doesn't matter
+                RWType = 3'bxxx;
+
+                signals_if.IntCause = 2'd1;
+                signals_if.MRet = 1'b0;
 
                 signals_if.ALU_Control = 4'bxxxx;
             end
         endcase
+
+        end
     end
 endmodule

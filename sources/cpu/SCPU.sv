@@ -8,6 +8,8 @@ module SCPU(
     input wire [31:0] inst_in, // Instruction input
     output wire [31:0] PC_out,   // Program counter output
 
+    input wire ext_int,    // External interrupt signal
+
     data_memory_face.cpu mem_if,
 
     `RegFile_Regs_output
@@ -29,6 +31,9 @@ module SCPU(
         .OPcode(inst_in[6:2]), // Opcode from instruction
         .Fun3(inst_in[14:12]), // Funct3 from instruction
         .Fun7(inst_in[30]),    // Funct7 from instruction
+        .instruction(inst_in), // Instruction input (right now for system instructions)
+
+        .ext_int(ext_int),     // External interrupt signal
         
         // signals to datapath
         .signals_if(signals_if.control_unit),

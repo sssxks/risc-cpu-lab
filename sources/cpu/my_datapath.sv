@@ -7,11 +7,11 @@ module my_datapath (
     input wire rst,
 
     input wire [31:0] inst_field, // 32-bit instruction
-    input wire [31:0] Data_in, // 32-bit data from data memory
+    output wire [31:0] PC_out, // current PC to instruction memory
     
     cpu_control_signals.datapath signals_if,
-
-    output wire [31:0] PC_out, // current PC to instruction memory
+    
+    input wire [31:0] Data_in, // 32-bit data from data memory
     output wire [31:0] Data_out, // 32-bit data to data memory
     output wire [31:0] Addr_out, // 32-bit address to data memory (ALU result)
     `RegFile_Regs_output
@@ -23,7 +23,10 @@ module my_datapath (
         .rst(rst),
 
         .pc_in(pc_next),
-        .pc_out(PC_out)
+        .pc_out(PC_out),
+
+        .int_cause(signals_if.IntCause),
+        .mret(signals_if.MRet) 
     );
     
     // Register File

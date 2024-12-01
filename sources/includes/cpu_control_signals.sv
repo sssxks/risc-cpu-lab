@@ -11,6 +11,9 @@ interface cpu_control_signals;
                          // 1: jalr, 0: others
     logic RegWrite; // 1: write to register
 
+    logic [1:0] IntCause;
+    logic MRet;
+
     modport control_unit (
         output ALU_Control,
         output ImmSel,
@@ -20,7 +23,9 @@ interface cpu_control_signals;
         output Branch,
         output InverseBranch,
         output PCOffset,
-        output RegWrite
+        output RegWrite,
+        output IntCause,
+        output MRet
     );
 
     modport datapath (
@@ -32,7 +37,9 @@ interface cpu_control_signals;
         input Branch,
         input InverseBranch,
         input PCOffset,
-        input RegWrite
+        input RegWrite,
+        input IntCause,
+        input MRet
     );
 
 endinterface //cpu_control_signals

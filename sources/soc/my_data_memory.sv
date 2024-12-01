@@ -1,7 +1,7 @@
 `include "header.sv"
 
 module my_data_memory (
-    input logic clk,
+    input wire clk,
     data_memory_face.mem mem_if
 );
     data_memory U3 (
