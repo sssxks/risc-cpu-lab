@@ -21,7 +21,8 @@ module my_cpu_control(
 );
     always @(*) begin
         if (rst) begin
-            
+            signals_if.IntCause <= 2'b0;
+            signals_if.MRet <= 1'b0;
         end else begin
             case (OPcode)
             `OPCODE_R_TYPE: begin
