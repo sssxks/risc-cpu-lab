@@ -7,11 +7,9 @@ module SCPU(
 
     input wire [31:0] inst_in, // Instruction input
     input wire [31:0] Data_in, // Data input from memory
-    input wire MIO_ready,      // Memory I/O ready signal
 
-    output wire MemRW,         // Memory read/write signal
-    output wire CPU_MIO,       // CPU to Memory I/O signal
-    output wire [31:0] Addr_out, // Address output to memory
+    output wire [3:0] MemWriteEnable,// Memory read/write signal
+    output wire [31:0] Addr_out_aligned, // Address output to memory
     output wire [31:0] Data_out, // Data output to memory
     output wire [31:0] PC_out,   // Program counter output
     `RegFile_Regs_output
@@ -26,7 +24,12 @@ module SCPU(
     wire InverseBranch;        // Inverse branch signal
     wire PCOffset;             // Program counter offset
     wire RegWrite;             // Register write enable
+    wire [3:0] RWType;         // Read/write type signal
     wire [3:0] ALU_Control;    // ALU control signals
+
+    // Memory signals
+    wire [31:0] Addr_out;      // Address output to memory
+    wire [31:0] Data_out_raw;  // Data output to memory
 
     // Instantiate the control unit
     my_cpu_control control_unit (
@@ -36,7 +39,6 @@ module SCPU(
         .Fun7(inst_in[30]),    // Funct7 from instruction
         
         // signals to datapath
-        .MIO_ready(MIO_ready), // Memory I/O ready signal
         .ImmSel(ImmSel),       // Immediate selection
         .ALUSrc_B(ALUSrc_B),   // ALU source B selection
         .MemtoReg(MemtoReg),   // Memory to register selection
@@ -46,8 +48,8 @@ module SCPU(
         .PCOffset(PCOffset),   // Program counter offset
         .RegWrite(RegWrite),   // Register write enable
         .MemRW(MemRW),         // Memory read/write signal
+        .RWType(RWType),       // Read/write type signal
         .ALU_Control(ALU_Control), // ALU control signals
-        .CPU_MIO(CPU_MIO)      // CPU to Memory I/O signal
     );
 
     // Instantiate the data path
@@ -68,8 +70,8 @@ module SCPU(
         .RegWrite(RegWrite),   // Register write enable
         
         .PC_out(PC_out),       // Program counter output
-        .Data_out(Data_out),   // Data output to memory
-        .ALU_out(Addr_out),     // Address output to memory
+        .Data_out_raw(Data_out_raw),   // Data output to memory
+        .Addr_out(Addr_out),   // Address output to memory
         `RegFile_Regs_Arguments
     );
 

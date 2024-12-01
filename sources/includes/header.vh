@@ -100,3 +100,10 @@
 `define IMMGEN_SB 3'b010
 `define IMMGEN_UJ 3'b011
 `define IMMGEN_U 3'b100
+
+// RW length and sign, same as fun3 for load/store
+`define BYTE   3'b000
+`define BYTE_U 3'b100
+`define HALF   3'b001
+`define HALF_U 3'b101
+`define WORD   3'b010

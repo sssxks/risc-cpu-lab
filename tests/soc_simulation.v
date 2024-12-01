@@ -8,7 +8,7 @@ module soc_simulation(
     wire [31:0] instruction;
     wire [31:0] datamem2cpu;
     wire [31:0] cpu2datamem;
-    wire data_memory_write_enable;
+    wire [3:0] data_memory_write_enable;
     wire [31:0] cpu2datamem_addr;
     wire [31:0] program_counter;
     
@@ -19,9 +19,7 @@ module soc_simulation(
 
         .inst_in(instruction),
         .Data_in(datamem2cpu),
-        .MIO_ready(1'b1),
-        .MemRW(data_memory_write_enable),
-        .CPU_MIO(), // unused
+        .MemWriteEnable(data_memory_write_enable),
         .Addr_out(cpu2datamem_addr),
         .Data_out(cpu2datamem),
         .PC_out(program_counter)

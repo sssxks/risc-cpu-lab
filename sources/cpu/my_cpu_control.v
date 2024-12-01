@@ -6,26 +6,22 @@ module my_cpu_control(
     input wire [2:0] Fun3, // instruction[12:14]
     input wire Fun7, // instruction[30]
 
-    input wire MIO_ready, 
-    output wire CPU_MIO,
-
     // signals to datapath
     output reg [2:0]ImmSel,
     output reg ALUSrc_B,
     output reg [1:0]MemtoReg,
+    output reg RegWrite,
 
     output reg Jump,
     output reg Branch,
     output reg InverseBranch,
     output reg PCOffset,
     
-    output reg RegWrite,
     output reg MemRW,
+    output reg [2:0] RWType,
     
-    output reg [3:0]ALU_Control
+    output reg [3:0] ALU_Control
 );
-    assign CPU_MIO = 1'b1; // not used so far
-
     always @(*) begin
         case (OPcode)
             `OPCODE_R_TYPE: begin
@@ -40,7 +36,9 @@ module my_cpu_control(
                 PCOffset = 1'bx; 
 
                 RegWrite = 1'b1;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 ALU_Control = {Fun7, Fun3};
             end
@@ -56,7 +54,9 @@ module my_cpu_control(
                 PCOffset = 1'bx; 
 
                 RegWrite = 1'b1;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 // I type format doesn't have Fun7
                 // but shift right logical & shift right arithmatic 
@@ -75,20 +75,11 @@ module my_cpu_control(
                 PCOffset = 1'bx; 
                 
                 RegWrite = 1'b1;
-                MemRW = 1'b0;
 
+                MemRW = 1'b0;
+                RWType = Fun3;
 
                 ALU_Control = `ALU_ADD;
-
-                // right now, only support lw
-                // case (Fun3)
-                //     FUN3_LW:
-                //     FUN3_LH:
-                //     FUN3_LHU
-                //     FUN3_LB: 
-                //     FUN3_LBU:
-                //     default: 
-                // endcase
             end
             `OPCODE_JALR: begin
                 ImmSel = `IMMGEN_I; // i type
@@ -101,7 +92,9 @@ module my_cpu_control(
                 PCOffset = 1'b1;
                 
                 RegWrite = 1'b1;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 ALU_Control = `ALU_ADD; // ADD
             end
@@ -117,17 +110,11 @@ module my_cpu_control(
                 PCOffset = 1'bx; 
                 
                 RegWrite = 1'b0;
+
                 MemRW = 1'b1;
+                RWType = Fun3;
 
                 ALU_Control = `ALU_ADD; // ADD
-
-                // right now, only support sw
-                // case (Fun3)
-                //     FUN3_SW:
-                //     FUN3_SH:
-                //     FUN3_SB:
-                //     default: 
-                // endcase
             end
             `OPCODE_SB_TYPE: begin // SB-type branch
                 ImmSel = `IMMGEN_SB;
@@ -140,7 +127,9 @@ module my_cpu_control(
                 PCOffset = 1'b0; 
                 
                 RegWrite = 1'b0;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 case (Fun3)
                     `FUN3_BEQ: ALU_Control = `ALU_EQ;
@@ -163,7 +152,9 @@ module my_cpu_control(
                 PCOffset = 1'b0; 
                 
                 RegWrite = 1'b1;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 // this instruction doesn't use ALU
                 ALU_Control = 4'bxxxx; // Undefined
@@ -179,7 +170,9 @@ module my_cpu_control(
                 PCOffset = 1'b0; 
 
                 RegWrite = 1'b1;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 // this instruction doesn't use ALU
                 ALU_Control = 4'bxxxx; // Undefined
@@ -195,7 +188,9 @@ module my_cpu_control(
                 PCOffset = 1'b0;
                 
                 RegWrite = 1'b1;
+
                 MemRW = 1'b0;
+                RWType = 3'b000; // doesn't matter
 
                 // this instruction doesn't use ALU
                 ALU_Control = 4'bxxxx; // Undefined
@@ -211,7 +206,9 @@ module my_cpu_control(
                 PCOffset = 1'bx; 
 
                 RegWrite = 1'bx;
+
                 MemRW = 1'bx;
+                RWType = 3'bxxx; // doesn't matter
 
                 ALU_Control = 4'bxxxx;
             end

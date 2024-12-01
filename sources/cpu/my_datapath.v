@@ -10,7 +10,7 @@ module my_datapath (
 
     input wire [3:0] ALU_Control, // ALU control signals
     input wire [2:0] ImmSel, // select signal to immgen. i-type / s-type / sb-type / uj-type
-    input wire [1:0] MemtoReg, // mem2reg(load) / alu2reg(R-type) / PC+4 (jalr)
+    input wire [1:0] MemtoReg, // mem2reg(load) / alu2reg(R-type) / (jalr/auipc) / immediate
     input wire ALUSrc_B, // 0: rs2, 1: imm
     input wire Jump, // unconditional jump instruction
     input wire Branch, // conditional jump instruction
@@ -21,8 +21,8 @@ module my_datapath (
     input wire RegWrite, // 1: write to register
 
     output wire [31:0] PC_out, // current PC to instruction memory
-    output wire [31:0] Data_out, // 32-bit data to data memory
-    output wire [31:0] ALU_out, // 32-bit ALU output (for debugging)
+    output wire [31:0] Data_out_raw, // 32-bit data to data memory
+    output wire [31:0] Addr_out, // 32-bit address to data memory (ALU result)
     `RegFile_Regs_output
 );
     // PC
@@ -63,6 +63,7 @@ module my_datapath (
         .imm_out(imm_out) // 32 bit immediate value
     );
 
+    wire [31:0] ALU_out;
     wire zero;
     my_ALU ALU (
         .A(rs1_data),
@@ -71,6 +72,8 @@ module my_datapath (
         .result(ALU_out),
         .zero(zero)
     );
+
+    assign Addr_out = ALU_out;
 
     wire [31:0] PC_incr = PC_out + 4;
     wire [31:0] PC_offset = PCOffset ? ALU_out : PC_out + imm_out; // for jalr
