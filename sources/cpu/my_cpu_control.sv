@@ -172,7 +172,7 @@ module my_cpu_control(
             `OPCODE_AUIPC: begin // AUIPC
                 signals_if.ImmSel = `IMMGEN_U;
                 signals_if.ALUSrc_B = 1'bx;
-                signals_if.MemtoReg = 2'd3;
+                signals_if.MemtoReg = 2'd2;
 
                 signals_if.Jump = 1'b0;
                 signals_if.Branch = 1'b0;

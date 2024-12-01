@@ -16,7 +16,7 @@ after_jalr:
     # assemble to 123482b7        lui x5 0x12348
     #             67828293        addi x5 x5 1656
     sw t0, 0x100(zero)     # store 0x12348678
-    lh t3, 0x100(zero)     # x28(t3) = 0x12348678
+    lh t3, 0x100(zero)     # x28(t3) = 0xffff8678
 
     # Test LHU (Load Halfword Unsigned)
     lhu t4, 0x100(zero)     # x29(t4) = 0x00008678
