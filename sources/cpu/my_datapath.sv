@@ -1,3 +1,4 @@
+`include "cpu_control_signals.sv"
 `include "header.sv"
 `include "vga_macro.vh"
 
@@ -7,18 +8,8 @@ module my_datapath (
 
     input wire [31:0] inst_field, // 32-bit instruction
     input wire [31:0] Data_in, // 32-bit data from data memory
-
-    input wire [3:0] ALU_Control, // ALU control signals
-    input wire [2:0] ImmSel, // select signal to immgen. i-type / s-type / sb-type / uj-type
-    input wire [1:0] MemtoReg, // mem2reg(load) / alu2reg(R-type) / (jalr/auipc) / immediate
-    input wire ALUSrc_B, // 0: rs2, 1: imm
-    input wire Jump, // unconditional jump instruction
-    input wire Branch, // conditional jump instruction
-    input wire InverseBranch, // 1: invert branch condition, 0: normal branch condition
-                              // only vaild when Branch=1
-    input wire PCOffset, // 1: offset PC by alu result, 0: immediate value
-                         // 1: jalr, 0: others
-    input wire RegWrite, // 1: write to register
+    
+    cpu_control_signals.datapath signals_if,
 
     output wire [31:0] PC_out, // current PC to instruction memory
     output wire [31:0] Data_out, // 32-bit data to data memory
@@ -43,7 +34,7 @@ module my_datapath (
         .clk(clk),
         .rst(rst),
 
-        .RegWrite(RegWrite),
+        .RegWrite(signals_if.RegWrite),
         
         .Rs1_addr(inst_field[19:15]),
         .Rs2_addr(inst_field[24:20]),
@@ -58,7 +49,7 @@ module my_datapath (
     // ALU
     wire [31:0] imm_out;
     my_immgen immgen(
-        .ImmSel(ImmSel), // type of the instruction
+        .ImmSel(signals_if.ImmSel), // type of the instruction
         .instr(inst_field), // raw instruction
         .imm_out(imm_out) // 32 bit immediate value
     );
@@ -67,8 +58,8 @@ module my_datapath (
     wire zero;
     my_ALU ALU (
         .A(rs1_data),
-        .ALU_operation(ALU_Control),
-        .B(ALUSrc_B ? imm_out : rs2_data),
+        .ALU_operation(signals_if.ALU_Control),
+        .B(signals_if.ALUSrc_B ? imm_out : rs2_data),
         .result(ALU_out),
         .zero(zero)
     );
@@ -76,13 +67,13 @@ module my_datapath (
     assign Addr_out = ALU_out;
 
     wire [31:0] PC_incr = PC_out + 4;
-    wire [31:0] PC_offset = PCOffset ? ALU_out : PC_out + imm_out; // for jalr
+    wire [31:0] PC_offset = signals_if.PCOffset ? ALU_out : PC_out + imm_out; // for jalr
 
     always @(*) begin
-        case (MemtoReg)
+        case (signals_if.MemtoReg)
             2'd0: reg_write_data = ALU_out;
             2'd1: reg_write_data = Data_in;
-            2'd2: reg_write_data = Jump ? PC_incr : PC_offset; // jump=1 -> jalr, jump=0 -> auipc
+            2'd2: reg_write_data = signals_if.Jump ? PC_incr : PC_offset; // jump=1 -> jalr, jump=0 -> auipc
             2'd3: reg_write_data = imm_out;
             default: reg_write_data = 32'bx;
         endcase
@@ -90,7 +81,7 @@ module my_datapath (
 
     assign Data_out = rs2_data; // sw rs2, 123(rs1): reg[rs2] -> mem[rs1 + 123]
 
-    wire if_pc_target = Jump || (Branch && (InverseBranch ? ~zero : zero));
+    wire if_pc_target = signals_if.Jump || (signals_if.Branch && (signals_if.InverseBranch ? ~zero : zero));
 
     assign pc_next = if_pc_target ? PC_offset : PC_incr;
 endmodule

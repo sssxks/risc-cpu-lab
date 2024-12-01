@@ -13,16 +13,8 @@ module SCPU(
     `RegFile_Regs_output
 );
 
-    // Control signals
-    wire [2:0] ImmSel;         // Immediate selection
-    wire ALUSrc_B;             // ALU source B selection
-    wire [1:0] MemtoReg;       // Memory to register selection
-    wire Jump;                 // Jump signal
-    wire Branch;               // Branch signal
-    wire InverseBranch;        // Inverse branch signal
-    wire PCOffset;             // Program counter offset
-    wire RegWrite;             // Register write enable
-    wire [3:0] ALU_Control;    // ALU control signals
+    // Control signals interface
+    cpu_control_signals signals_if();
 
     // Memory signals
     logic MemRW;
@@ -39,19 +31,11 @@ module SCPU(
         .Fun7(inst_in[30]),    // Funct7 from instruction
         
         // signals to datapath
-        .ImmSel(ImmSel),       // Immediate selection
-        .ALUSrc_B(ALUSrc_B),   // ALU source B selection
-        .MemtoReg(MemtoReg),   // Memory to register selection
-        .Jump(Jump),           // Jump signal
-        .Branch(Branch),       // Branch signal
-        .InverseBranch(InverseBranch),// Inverse branch signal
-        .PCOffset(PCOffset),   // Program counter offset
-        .RegWrite(RegWrite),   // Register write enable
-        .ALU_Control(ALU_Control), // ALU control signals
+        .signals_if(signals_if.control_unit),
 
         // Memory signals
         .MemRW(MemRW),         // Memory read/write signal
-        .RWType(RWType)       // Read/write type signal
+        .RWType(RWType)        // Read/write type signal
     );
 
     // Instantiate the data path
@@ -59,15 +43,7 @@ module SCPU(
         .clk(clk),             // Clock signal
         .rst(rst),             // Reset signal
         
-        .ALU_Control(ALU_Control), // ALU control signals
-        .ImmSel(ImmSel),       // Immediate selection
-        .MemtoReg(MemtoReg),   // Memory to register selection
-        .ALUSrc_B(ALUSrc_B),   // ALU source B selection
-        .Jump(Jump),           // Jump signal
-        .Branch(Branch),       // Branch signal
-        .InverseBranch(InverseBranch),// Inverse branch signal
-        .PCOffset(PCOffset),   // Program counter offset
-        .RegWrite(RegWrite),   // Register write enable
+        .signals_if(signals_if.datapath),
         
         .inst_field(inst_in),  // Instruction input
         .PC_out(PC_out),       // Program counter output
