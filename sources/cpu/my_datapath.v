@@ -15,7 +15,9 @@ module my_datapath (
     input wire Jump, // unconditional jump instruction
     input wire Branch, // conditional jump instruction
     input wire InverseBranch, // 1: invert branch condition, 0: normal branch condition
+                              // only vaild when Branch=1
     input wire PCOffset, // 1: offset PC by alu result, 0: immediate value
+                         // 1: jalr, 0: others
     input wire RegWrite, // 1: write to register
 
     output wire [31:0] PC_out, // current PC to instruction memory
