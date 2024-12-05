@@ -23,13 +23,14 @@ module my_PC (
             mtvec[1] <= 32'h4;
             mtvec[2] <= 32'h8;
             mtvec[3] <= 32'hc;
-        end if (int_cause != 2'b00) begin
-            mepc <= pc_out;
-            pc_out <= mtvec[int_cause];
-        end else if (mret) begin
-            pc_out <= mepc;
         end else begin
-            pc_out <= pc_in;
+            if (int_cause != 2'b00) begin
+                mepc <= pc_out + 32'd4; // TODO change this to pc_in
+                                        // in case we interrupt on a jump
+                pc_out <= mtvec[int_cause];
+            end else begin
+                pc_out <= mret ? mepc : pc_in;
+            end
         end
 end
 

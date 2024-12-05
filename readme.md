@@ -1,14 +1,10 @@
-jalr ok
-auipc ok
-lui ok
+# RV32I (subset) single cycle processor
 
-lh ok
-lhu ok
-lb ok
-sh ok
-sb ok
+This is a simple implementation of a RV32I processor in Verilog. ZJU organization course project.
 
-illegal instruction ok, wait for test
-ecall ok, wait for test
-external interrupt ok, wait for test
-mret ok, wait for test
+## Features
+
+- RV32I instruction set
+- Simple interrupt handling
+
+for more details, please refer to the [report](./report/report.pdf).

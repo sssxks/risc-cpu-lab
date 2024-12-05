@@ -33,7 +33,6 @@ module soc_simulation(
         .clk(clk),
         .mem_if(mem_if.mem)
     );
-
 endmodule
 
 
@@ -50,6 +49,11 @@ module soc_simulation_tb;
         ext_int = 1'b0;
         #5;
         rst = 1'b0;
+
+        #120;
+        ext_int = 1'b1;
+        #50;
+        ext_int = 1'b0;
     end
 
     always #50 clk = ~clk;
