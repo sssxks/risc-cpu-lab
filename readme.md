@@ -7,4 +7,4 @@ This is a simple implementation of a RV32I processor in Verilog. ZJU organizatio
 - RV32I instruction set
 - Simple interrupt handling
 
-for more details, please refer to the [report](./report/report.pdf).
+for more details, please refer to the [report](./doc/report.pdf).
