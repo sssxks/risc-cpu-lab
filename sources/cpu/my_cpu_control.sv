@@ -19,7 +19,7 @@ module my_cpu_control(
     output reg [2:0] RWType
     
 );
-    reg int_cause;
+    reg [1:0] int_cause;    
 
     assign signals_if.IntCause = ext_int ? 2'b11 : int_cause;
 
@@ -259,9 +259,8 @@ module my_cpu_control(
 
                 signals_if.RegWrite = 1'b0;
 
-                MemRW = 1'bx;
+                MemRW = 1'b0;
                 RWType = 3'bxxx;
-
 
                 signals_if.ALU_Control = 4'bxxxx;
                 case (instruction[31:20])
